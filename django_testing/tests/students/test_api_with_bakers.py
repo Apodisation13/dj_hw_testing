@@ -2,8 +2,8 @@ import pytest
 from django.urls import reverse
 from rest_framework.status import \
     HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, \
-    HTTP_404_NOT_FOUND, HTTP_200_OK
-
+    HTTP_404_NOT_FOUND, HTTP_200_OK, HTTP_302_FOUND
+from django.test import Client
 from students.models import *
 
 TEST_FIELDS = ['name', 'expected_status']
@@ -188,3 +188,10 @@ class TestCourseBaker:
         url = reverse('courses-detail', kwargs={'pk': course.pk})
         response = api_client.patch(url, data=new_data)  # trying to add 3 students
         assert response.status_code == HTTP_400_BAD_REQUEST  # it's not allowed, bad request
+
+    def test_redirect(self):
+        client = Client()
+        response = client.get("")  # пустой путь home
+
+        assert response.status_code == HTTP_302_FOUND
+        assert response.url == "/api/v1/"  # redirect на api/v1/
